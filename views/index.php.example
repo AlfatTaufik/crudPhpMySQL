@@ -1,0 +1,107 @@
+<?php
+require_once '../config/db_connect.php';
+require_once '../models/User.php';
+require_once '../models/Article.php';
+require_once '../controllers/UserController.php';
+
+if (!$_SESSION['token']) {
+    header('Location: login.php');
+} else {
+
+    $datas = getAll("WHERE token=" . $_SESSION['token']);
+    foreach ($datas as $data) {
+        $username = $data['name'];
+        $token = $data['token'];
+        $id = $data['id'];
+    }
+    $articles = articles();
+    $allArticles = allArticles();
+    // var_dump($allArticles);
+
+    if (isset($_POST['logout'])) {
+        logout($token);
+        header('Location: ' . auth());
+    }
+    if (isset($_POST['profile'])) {
+        header('Location: user/create.php');
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <link rel="stylesheet" href="../public/src/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/src/css/styles.css">
+</head>
+
+<body>
+    <div>
+        <header>
+            <a href="#" class="logo-wrapper td-none">
+                <div><span> Al </span>lfat</div>
+            </a>
+            <nav>
+                <ul class="navmenu">
+                    <li class="navitem"><a href="#port">Portfolio</a></li>
+                    <li class="navitem"><a href="#blog">Blog</a></li>
+                    <li class="navitem">
+                        <a href="#">Best Article</a>
+
+                    </li>
+                    <li class="navitem"><a href="views">Login</a></li>
+                    <li class="navitem">
+                        <a href="#"><i class="fa-solid fa-user">Alfattn</i></a>
+                        <ul class="dropdown">
+                            <li>
+                                <form action="user/profile.php" method="POST">
+                                    <input type="hidden" name="id" value="<?= $id ?>">
+                                    <button type="submit" name="profile" class="btn btn-outline-primary">Profile</button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="" method="POST">
+                                    <button type="submit" name="logout" class="btn btn-outline-primary">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+    </div>
+    </nav>
+    <div class="d-flex align-items-center">
+        <div class="d-flex flex-wrap text-center" style="margin: 0 50px;">
+            <?php foreach ($allArticles as $allArticle) : ?>
+                <div class="mx-2 mb-5">
+                    <div class="card" style="width: 18rem; height:20rem;">
+                        <div class="text-center">
+                            <img src="<?= $allArticle['image'] ?>" class="card-img-top" style="height: 200px;">
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text"><?= $allArticle['title'] ?></p>
+                        </div>
+                        <div class="d-flex text-center ml-2 justify-content-between px-2">
+                            <div style="width :100px;" class="d-flex">
+                                <img src="<?= $allArticle['userImage'] ?>" alt="" style="width: 35px; height: 35px; margin-right: 5px;">
+                                <p class="text-center mt-2"><?= $allArticle['name'] ?></p>
+                            </div>
+                            <div class="">
+                                <a href="detail.php?id=<?= $allArticle['id'] ?>"><button type="button" class="btn btn-primary">Details</button></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
